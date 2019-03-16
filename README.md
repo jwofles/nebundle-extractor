@@ -1,5 +1,5 @@
 # nebundle-extractor
-Extract .PNGs (textures) from [Alice 3.0](http://www.alice.org/get-alice/alice-3/)'s .Nebundle files.
+Extract .PNGs (textures) from [Alice 3.0's](http://www.alice.org/get-alice/alice-3/) .nebundle files.
 
 ## what is this?
 This is a little tool I made to scan through the .nebundle files included in Alice 3.0 and export any .PNGs found and save them to their own files.
