@@ -8,4 +8,4 @@ Theoretically it can extract PNGs from any binary file that contains .PNGs, howe
 It works by finding certain byte sequences that are part of the .PNG byte chunks. It finds the start of the the PNG chunk (IHDR) and then reads until it finds the end of the chunk (IEND). Then it saves that to a new file with the PNG header.
 
 ## how do i use this?
-Down the .exe from the releases tab and open it. Then drag any .nebundle file onto it, and it will go through the whole file to export any .PNGs in there onto a new folder on your desktop.
+Download the .exe from the releases tab and open it. Then drag any .nebundle file onto it, and it will go through the whole file to export any .PNGs in there onto a new folder on your desktop.
