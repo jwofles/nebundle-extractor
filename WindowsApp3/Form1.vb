@@ -31,55 +31,52 @@ Public Class Form1
         Dim findLen As Integer = ihdrBytes.Length
         Dim retLen As Integer = 10
         Dim imageBytes As List(Of Byte) = New List(Of Byte)
+        Dim searchingForEnd As Boolean = False
         For i As Integer = 0 To bytes.Length - 1
-            If bytes(i) = ihdrBytes(0) Then
-                If bytes.Skip(i).Take(findLen).SequenceEqual(ihdrBytes) Then
-                    'Dim output() As Byte = bytes.Skip(x).Take(retLen).ToArray
-                    imageNum += 1
-                    Label2.Text = ("Currently extracting image" & imageNum)
-                    Application.DoEvents()
-                    fileIsOpen = True
-                    imageBytes.Clear()
-                    ''WB.Write({137, 80, 78, 71, 13, 10, 26, 10}) ' PNG HEADER
-                    'WB.Write({0, 0, 0, 13, 73, 72, 68, 82})
+            If searchingForEnd = False Then
+                If bytes(i) = ihdrBytes(0) Then
+                    If bytes.Skip(i).Take(findLen).SequenceEqual(ihdrBytes) Then
+                        'Dim output() As Byte = bytes.Skip(x).Take(retLen).ToArray
+                        imageNum += 1
+                        Label2.Text = ("Currently extracting image" & imageNum)
+                        Application.DoEvents()
+                        fileIsOpen = True
+                        imageBytes.Clear()
+                        searchingForEnd = True
+                        ''WB.Write({137, 80, 78, 71, 13, 10, 26, 10}) ' PNG HEADER
+                        'WB.Write({0, 0, 0, 13, 73, 72, 68, 82})
+                    End If
                 End If
             End If
             If fileIsOpen = True Then
                 ''WB.Write(bytes(i))
                 imageBytes.Add(bytes(i))
             End If
-
-            If bytes(i) = iendBytes(0) Then
-                If bytes.Skip(i).Take(findLen).SequenceEqual(iendBytes) Then
-                    'Dim output() As Byte = bytes.Skip(x).Take(retLen).ToArray
-                    Dim path As String = My.Computer.FileSystem.SpecialDirectories.Desktop & "\" & fileName & "_extracted\image" & imageNum & ".png"
-
-                    Dim FS As New FileStream(path, FileMode.Create)
-                    Dim WB As New BinaryWriter(FS)
-                    WB.Write({137, 80, 78, 71, 13, 10, 26, 10}) ' PNG HEADER
-                    WB.Write(imageBytes.ToArray)
-                    WB.Write({73, 69, 78, 68, 174, 66, 96, 130}) 'iend
-                    fileIsOpen = False
-                    FS.Close()
-                    Dim fi As New IO.FileInfo(path)
-                    If fi.Length <= bytePurge Then
-                        My.Computer.FileSystem.DeleteFile(path)
-                        Application.DoEvents()
-                        'Label2.Text = ("Image" & imageNum & " only " & fi.Length & " bytes, it has been purged")
-                        imageNum -= 1
+            If searchingForEnd = True Then
+                If bytes(i) = iendBytes(0) Then
+                    If bytes.Skip(i).Take(findLen).SequenceEqual(iendBytes) Then
+                        'Dim output() As Byte = bytes.Skip(x).Take(retLen).ToArray
+                        Dim path As String = My.Computer.FileSystem.SpecialDirectories.Desktop & "\" & fileName & "_extracted\image" & imageNum & ".png"
+                        Dim FS As New FileStream(path, FileMode.Create)
+                        Dim WB As New BinaryWriter(FS)
+                        WB.Write({137, 80, 78, 71, 13, 10, 26, 10}) ' PNG HEADER
+                        WB.Write(imageBytes.ToArray)
+                        WB.Write({73, 69, 78, 68, 174, 66, 96, 130}) 'iend
+                        fileIsOpen = False
+                        FS.Close()
+                        Dim fi As New IO.FileInfo(path)
+                        If fi.Length <= bytePurge Then
+                            My.Computer.FileSystem.DeleteFile(path)
+                            Application.DoEvents()
+                            'Label2.Text = ("Image" & imageNum & " only " & fi.Length & " bytes, it has been purged")
+                            imageNum -= 1
+                        End If
+                        searchingForEnd = False
                     End If
                 End If
             End If
         Next
 
-        'MsgBox(pngHeader)
-        'If number = 0 And number + 1 = 0 And number + 2 = 0 And number + 3 = 13 Then
-        '    MsgBox("found")
-        '    Dim pngByteList() As Byte
-        '    imageNum += 1
-        '    File.WriteAllBytes("\" & fileName & "\" & imageNum & ".png", pngByteList)
-        'End If
-        'Next
         Button1.Enabled = True
         MsgBox("Finished")
         updater.Text = ("Drag And drop the nebundle you would Like to extract")
@@ -96,7 +93,7 @@ Public Class Form1
     Private Sub Form1_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         Me.AllowDrop = True
         Button1.Enabled = False
-        TextBox1.Text = ("100")
+        TextBox1.Text = ("500")
         CheckBox1.Checked = True
         'TextBox1.Enabled = True
     End Sub
@@ -124,7 +121,7 @@ Public Class Form1
             bytePurge = Convert.ToInt32(TextBox1.Text)
         Catch
             bytePurge = 0
-            CheckBox1.Text = ("Purge files smaller than ?? bytes")
+            CheckBox1.Text = ("Purge files smaller than 0 bytes")
         End Try
     End Sub
 
